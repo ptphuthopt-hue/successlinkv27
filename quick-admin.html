@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Admin Access - Successlink</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 3rem 4rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #4DA8DA;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            background: #4DA8DA;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        button:hover {
+            background: #3d8bb5;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(77, 168, 218, 0.4);
+        }
+
+        button.secondary {
+            background: #6c757d;
+        }
+
+        button.secondary:hover {
+            background: #5a6268;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .info-title {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            background: #e9ecef;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+        }
+
+        .status {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem 1.5rem;
+            margin-top: 2rem;
+            text-align: left;
+            border-radius: 0.5rem;
+        }
+
+        .instructions h3 {
+            color: #856404;
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions ol {
+            margin-left: 1.5rem;
+            color: #856404;
+        }
+
+        .instructions li {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🚀 Quick Admin Access</h1>
+        <p class="subtitle">Successlink Admin Dashboard</p>
+
+        <div class="info-box">
+            <div class="info-title">📋 Thông tin đăng nhập</div>
+            <div class="info-item">
+                <span class="info-label">Email:</span>
+                <span class="info-value">admin@successlink.com</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Password:</span>
+                <span class="info-value">admin123</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Backend:</span>
+                <span class="info-value" style="font-size: 0.8rem;">successlinkv2-backend.onrender.com</span>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button onclick="autoLogin()">🔐 Đăng nhập tự động</button>
+            <button class="secondary" onclick="openAdmin()">📊 Mở Admin Dashboard</button>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div class="instructions">
+            <h3>⚠️ Nếu không vào được:</h3>
+            <ol>
+                <li>Click "Đăng nhập tự động" → Đợi thông báo thành công</li>
+                <li>Click "Mở Admin Dashboard" → Sẽ mở tab mới</li>
+                <li>Nếu vẫn không được, mở <strong>Incognito/Private</strong> mode</li>
+                <li>Hoặc clear cache: <strong>Ctrl+Shift+Delete</strong></li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://successlinkv2-backend.onrender.com/api';
+        const ADMIN_URL = 'https://successlinkv26.vercel.app/admin.html';
+
+        async function autoLogin() {
+            const statusEl = document.getElementById('status');
+            statusEl.className = 'status';
+            statusEl.textContent = '⏳ Đang đăng nhập...';
+            statusEl.style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@successlink.com',
+                        password: 'admin123'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Đăng nhập thất bại');
+                }
+
+                // Save to localStorage
+                localStorage.setItem('token', data.data.token);
+                localStorage.setItem('user', JSON.stringify(data.data.user));
+
+                statusEl.className = 'status success';
+                statusEl.textContent = '✅ Đăng nhập thành công! Click "Mở Admin Dashboard" để vào.';
+
+                console.log('✅ Login successful:', data.data.user);
+                console.log('🔑 Token saved to localStorage');
+
+            } catch (error) {
+                statusEl.className = 'status error';
+                statusEl.textContent = '❌ Lỗi: ' + error.message;
+                console.error('Login error:', error);
+            }
+        }
+
+        function openAdmin() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('⚠️ Vui lòng đăng nhập trước!\n\nClick "Đăng nhập tự động" rồi thử lại.');
+                return;
+            }
+
+            // Open in new tab
+            window.open(ADMIN_URL, '_blank');
+        }
+
+        // Auto-login on page load
+        window.addEventListener('load', () => {
+            console.log('🚀 Quick Admin Access loaded');
+            console.log('📍 Backend:', API_BASE_URL);
+            console.log('📍 Admin URL:', ADMIN_URL);
+        });
+    </script>
+</body>
+
+</html>

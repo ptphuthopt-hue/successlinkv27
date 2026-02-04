@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Successlink - Công cụ tạo bài giảng AI siêu tốc dành cho giáo viên">
+    <title>Successlink - AI Teaching Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+    <!-- Login Screen (First screen) -->
+    <div id="login-screen" class="screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <h1 class="login-title">Successlink</h1>
+                <p class="login-subtitle">Công cụ tạo bài giảng AI siêu tốc dành cho giáo viên</p>
+            </div>
+
+            <div class="login-content">
+                <!-- Auth Tabs -->
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">Đăng nhập</button>
+                    <button class="auth-tab" data-tab="register">Đăng ký</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" class="auth-form active">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" placeholder="email@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Mật khẩu</label>
+                        <input type="password" id="login-password" placeholder="Nhập mật khẩu" required>
+                    </div>
+                    <button type="submit" class="btn-primary btn-full">Đăng nhập</button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="register-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="register-name">Họ và tên</label>
+                        <input type="text" id="register-name" placeholder="Nguyễn Văn A" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" placeholder="email@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Mật khẩu</label>
+                        <input type="password" id="register-password" placeholder="Tối thiểu 6 ký tự" required>
+                    </div>
+                    <button type="submit" class="btn-primary btn-full">Đăng ký</button>
+                </form>
+
+                <div class="divider">
+                    <span>hoặc</span>
+                </div>
+
+                <!-- Google Sign-In Button -->
+                <div id="google-signin-button" class="google-signin-wrapper"></div>
+            </div>
+
+            <p class="login-footer">
+                Bằng cách đăng nhập, bạn đồng ý với
+                <a href="#" class="link">Điều khoản dịch vụ</a> và
+                <a href="#" class="link">Chính sách bảo mật</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Onboarding Screen -->
+    <div id="onboarding-screen" class="screen">
+        <div class="onboarding-container">
+            <h1 class="onboarding-title">Thầy/Cô đang giảng dạy cấp học nào?</h1>
+            <div class="level-cards">
+                <div class="level-card" data-level="elementary">
+                    <div class="level-icon">🎒</div>
+                    <h3>Tiểu học</h3>
+                </div>
+                <div class="level-card" data-level="middle">
+                    <div class="level-icon">📚</div>
+                    <h3>Trung học Cơ sở</h3>
+                </div>
+                <div class="level-card" data-level="high">
+                    <div class="level-icon">🎓</div>
+                    <h3>Trung học Phổ thông</h3>
+                </div>
+            </div>
+
+            <div id="subject-selection" class="subject-selection hidden">
+                <h2 class="subject-title">Thầy/Cô đang giảng dạy môn gì?</h2>
+                <select id="subject-dropdown" class="subject-dropdown">
+                    <option value="">-- Chọn môn học --</option>
+                    <option value="toan">Toán</option>
+                    <option value="van">Ngữ văn</option>
+                    <option value="anh">Tiếng Anh</option>
+                    <option value="ly">Vật lý</option>
+                    <option value="hoa">Hóa học</option>
+                    <option value="sinh">Sinh học</option>
+                    <option value="su">Lịch sử</option>
+                    <option value="dia">Địa lý</option>
+                    <option value="gdcd">GDCD</option>
+                    <option value="tin">Tin học</option>
+                    <option value="other">Khác</option>
+                </select>
+                <button id="start-button" class="btn-primary" disabled>Bắt đầu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Creation Workspace -->
+    <div id="workspace-screen" class="screen">
+        <div class="workspace-container">
+            <div class="workspace-header">
+                <h1 class="app-title">Successlink</h1>
+
+                <!-- Profile Menu -->
+                <div class="profile-menu">
+                    <button class="profile-button" id="profile-button">
+                        <div class="profile-avatar" id="profile-avatar">U</div>
+                    </button>
+
+                    <div class="profile-dropdown" id="profile-dropdown">
+                        <div class="profile-info">
+                            <div class="profile-avatar-large" id="profile-avatar-large">U</div>
+                            <div class="profile-details">
+                                <div class="profile-name" id="profile-name">User Name</div>
+                                <div class="profile-email" id="profile-email">user@email.com</div>
+                            </div>
+                        </div>
+
+                        <div class="profile-divider"></div>
+
+                        <div class="subscription-tier">
+                            <span class="tier-icon">🎯</span>
+                            <span class="tier-label">Gói:</span>
+                            <span class="tier-badge" id="tier-badge">Free</span>
+                        </div>
+
+                        <div class="profile-divider"></div>
+
+                        <button class="profile-menu-item" id="edit-name-btn">
+                            <span class="menu-icon">✏️</span>
+                            <span>Sửa tên</span>
+                        </button>
+
+                        <button class="profile-menu-item logout-btn" id="logout-btn">
+                            <span class="menu-icon">🚪</span>
+                            <span>Đăng xuất</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <div class="input-wrapper">
+                    <input type="text" id="lesson-input" class="lesson-input"
+                        placeholder="Nhập tên bài học hoặc tải lên tài liệu...">
+                    <label for="file-upload" class="upload-icon">📎</label>
+                    <input type="file" id="file-upload" class="file-upload-hidden" accept=".pdf,.doc,.docx,.txt">
+                </div>
+            </div>
+
+            <div class="content-types">
+                <div class="content-card" data-type="slide">
+                    <div class="card-icon">📊</div>
+                    <h3>Slide</h3>
+                    <div class="card-checkmark">✓</div>
+                </div>
+                <div class="content-card" data-type="infographic">
+                    <div class="card-icon">📈</div>
+                    <h3>Infographic</h3>
+                    <div class="card-checkmark">✓</div>
+                </div>
+                <div class="content-card" data-type="mindmap">
+                    <div class="card-icon">🧠</div>
+                    <h3>Mindmap</h3>
+                    <div class="card-checkmark">✓</div>
+                </div>
+                <div class="content-card" data-type="quiz">
+                    <div class="card-icon">❓</div>
+                    <h3>Quiz</h3>
+                    <p class="card-note">10 câu trắc nghiệm</p>
+                    <div class="card-checkmark">✓</div>
+                </div>
+            </div>
+
+            <button id="create-button" class="btn-create" disabled>TẠO BÀI GIẢNG</button>
+
+            <!-- Lesson History Section -->
+            <div class="lesson-history-section">
+                <div class="history-header">
+                    <h2 class="history-title">
+                        <span class="history-icon">📚</span>
+                        Lịch sử bài giảng
+                        <span class="lesson-count" id="lesson-count">(0)</span>
+                    </h2>
+
+                    <!-- View Toggle -->
+                    <div class="view-toggle">
+                        <button class="view-btn active" id="grid-view-btn" title="Hiển thị lưới">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <rect x="2" y="2" width="6" height="6" rx="1" />
+                                <rect x="12" y="2" width="6" height="6" rx="1" />
+                                <rect x="2" y="12" width="6" height="6" rx="1" />
+                                <rect x="12" y="12" width="6" height="6" rx="1" />
+                            </svg>
+                        </button>
+                        <button class="view-btn" id="list-view-btn" title="Hiển thị danh sách">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <rect x="2" y="3" width="16" height="2" rx="1" />
+                                <rect x="2" y="9" width="16" height="2" rx="1" />
+                                <rect x="2" y="15" width="16" height="2" rx="1" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="history-filters">
+                    <select id="filter-grade" class="filter-select">
+                        <option value="all">Tất cả lớp</option>
+                        <option value="elementary">Tiểu học</option>
+                        <option value="middle">THCS</option>
+                        <option value="high">THPT</option>
+                    </select>
+
+                    <select id="filter-subject" class="filter-select">
+                        <option value="all">Tất cả môn</option>
+                        <option value="toan">Toán</option>
+                        <option value="van">Ngữ văn</option>
+                        <option value="anh">Tiếng Anh</option>
+                        <option value="ly">Vật lý</option>
+                        <option value="hoa">Hóa học</option>
+                        <option value="sinh">Sinh học</option>
+                        <option value="su">Lịch sử</option>
+                        <option value="dia">Địa lý</option>
+                        <option value="gdcd">GDCD</option>
+                        <option value="tin">Tin học</option>
+                        <option value="other">Khác</option>
+                    </select>
+
+                    <select id="filter-sort" class="filter-select">
+                        <option value="newest">Mới nhất</option>
+                        <option value="oldest">Cũ nhất</option>
+                        <option value="az">A-Z</option>
+                    </select>
+                </div>
+
+                <!-- Lesson Cards -->
+                <div class="lesson-cards" id="lesson-cards">
+                    <!-- Lessons will be loaded here dynamically -->
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state hidden" id="empty-state">
+                    <div class="empty-icon">📚</div>
+                    <p class="empty-text">Chưa có bài giảng nào</p>
+                    <p class="empty-subtext">Tạo bài giảng đầu tiên của bạn!</p>
+                </div>
+
+                <!-- Load More Button -->
+                <button class="btn-load-more hidden" id="load-more-btn">
+                    Xem thêm
+                </button>
+            </div>
+
+            <!-- Loading Animation -->
+            <div id="loading-overlay" class="loading-overlay hidden">
+                <div class="loading-content">
+                    <div class="loading-animation">
+                        <div class="pen-writing"></div>
+                    </div>
+                    <p class="loading-text">Đang tạo bài giảng...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teaching Dashboard -->
+    <div id="dashboard-screen" class="screen">
+        <div class="dashboard-container">
+            <!-- Floating Navigation Dock -->
+            <div class="floating-dock">
+                <button class="dock-item active" data-view="slide" title="Slide">
+                    <span class="dock-icon">📊</span>
+                </button>
+                <button class="dock-item" data-view="infographic" title="Infographic">
+                    <span class="dock-icon">📈</span>
+                </button>
+                <button class="dock-item" data-view="mindmap" title="Mindmap">
+                    <span class="dock-icon">🧠</span>
+                </button>
+                <button class="dock-item" data-view="quiz" title="Quiz">
+                    <span class="dock-icon">❓</span>
+                </button>
+                <div class="dock-divider"></div>
+                <button class="dock-item" id="back-to-workspace" title="Tạo bài mới">
+                    <span class="dock-icon">➕</span>
+                </button>
+            </div>
+
+            <!-- Main Viewport -->
+            <div class="main-viewport">
+                <!-- Slide View -->
+                <div id="slide-view" class="content-view active">
+                    <div class="slide-container">
+                        <div id="slide-content" class="slide-content"></div>
+                        <div class="slide-navigation">
+                            <button id="prev-slide" class="nav-btn">←</button>
+                            <span id="slide-counter" class="slide-counter">1 / 10</span>
+                            <button id="next-slide" class="nav-btn">→</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Infographic View -->
+                <div id="infographic-view" class="content-view">
+                    <div class="infographic-container">
+                        <img id="infographic-content" class="infographic-content" alt="Infographic">
+                    </div>
+                </div>
+
+                <!-- Mindmap View -->
+                <div id="mindmap-view" class="content-view">
+                    <div class="mindmap-container">
+                        <div id="mindmap-content" class="mindmap-content"></div>
+                    </div>
+                </div>
+
+                <!-- Quiz View -->
+                <div id="quiz-view" class="content-view">
+                    <div class="quiz-container">
+                        <div class="quiz-header">
+                            <h2>Bài kiểm tra</h2>
+                            <button id="export-zalo" class="btn-export">📤 Xuất ảnh Zalo</button>
+                        </div>
+                        <div id="quiz-content" class="quiz-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/google-login.js"></script>
+    <script src="js/onboarding.js"></script>
+    <script src="js/workspace.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/lesson-history.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

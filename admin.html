@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Successlink</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">Successlink</h1>
+                <p class="logo-subtitle">Admin Dashboard</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-view="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#users" class="nav-item" data-view="users">
+                    <span class="nav-icon">👥</span>
+                    <span>Users</span>
+                </a>
+                <a href="#ai-providers" class="nav-item" data-view="ai-providers">
+                    <span class="nav-icon">🤖</span>
+                    <span>AI Providers</span>
+                </a>
+                <a href="#analytics" class="nav-item" data-view="analytics">
+                    <span class="nav-icon">📈</span>
+                    <span>Analytics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <img id="admin-avatar" src="" alt="Admin" class="user-avatar">
+                    <div class="user-details">
+                        <p id="admin-name" class="user-name">Admin</p>
+                        <p id="admin-email" class="user-email">admin@successlink.com</p>
+                    </div>
+                </div>
+                <button id="logout-btn" class="btn-logout">Đăng xuất</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view active">
+                <div class="view-header">
+                    <h2>Dashboard Overview</h2>
+                    <p class="view-subtitle">Tổng quan hệ thống</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <p class="stat-label">Total Users</p>
+                            <p id="stat-total-users" class="stat-value">0</p>
+                            <p id="stat-new-users" class="stat-change">+0 tuần này</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-content">
+                            <p class="stat-label">Total Lessons</p>
+                            <p id="stat-total-lessons" class="stat-value">0</p>
+                            <p id="stat-new-lessons" class="stat-change">+0 tuần này</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">🤖</div>
+                        <div class="stat-content">
+                            <p class="stat-label">AI Requests</p>
+                            <p id="stat-ai-requests" class="stat-value">0</p>
+                            <p id="stat-avg-response" class="stat-change">~0ms</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-content">
+                            <p class="stat-label">Total Cost</p>
+                            <p id="stat-total-cost" class="stat-value">$0.00</p>
+                            <p id="stat-cost-month" class="stat-change">30 ngày qua</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>AI Usage Trend (7 Days)</h3>
+                        <canvas id="usage-trend-chart"></canvas>
+                    </div>
+
+                    <div class="chart-card">
+                        <h3>Provider Distribution</h3>
+                        <canvas id="provider-distribution-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="activity-card">
+                    <h3>Recent Users</h3>
+                    <div id="recent-users" class="activity-list"></div>
+                </div>
+            </div>
+
+            <!-- Users View -->
+            <div id="users-view" class="view">
+                <div class="view-header">
+                    <div>
+                        <h2>User Management</h2>
+                        <p class="view-subtitle">Quản lý người dùng</p>
+                    </div>
+                    <div class="view-actions">
+                        <input type="text" id="user-search" class="search-input" placeholder="Tìm kiếm user...">
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Level</th>
+                                <th>Subject</th>
+                                <th>Role</th>
+                                <th>Lessons</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <tr>
+                                <td colspan="8" class="loading">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="users-pagination" class="pagination"></div>
+            </div>
+
+            <!-- AI Providers View -->
+            <div id="ai-providers-view" class="view">
+                <div class="view-header">
+                    <div>
+                        <h2>AI Provider Management</h2>
+                        <p class="view-subtitle">Quản lý API keys</p>
+                    </div>
+                    <button id="add-provider-btn" class="btn-primary">+ Add Provider</button>
+                </div>
+
+                <div id="providers-grid" class="providers-grid">
+                    <!-- Provider cards will be inserted here -->
+                </div>
+
+                <!-- Add/Edit Provider Modal -->
+                <div id="provider-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="modal-title">Add AI Provider</h3>
+                            <button class="modal-close">&times;</button>
+                        </div>
+                        <form id="provider-form">
+                            <div class="form-group">
+                                <label>Provider Type</label>
+                                <select id="provider-type" required>
+                                    <option value="">Select provider...</option>
+                                    <option value="gemini">Google Gemini</option>
+                                    <option value="openrouter">OpenRouter</option>
+                                    <option value="chatgpt">OpenAI ChatGPT</option>
+                                    <option value="claude">Anthropic Claude</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Display Name</label>
+                                <input type="text" id="provider-display-name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>API Key</label>
+                                <input type="password" id="provider-api-key" required>
+                                <small>API key sẽ được mã hóa trong database</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Endpoint URL (Optional)</label>
+                                <input type="url" id="provider-endpoint">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Model</label>
+                                <input type="text" id="provider-model" placeholder="e.g., gemini-pro, gpt-4">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Priority (1 = highest)</label>
+                                    <input type="number" id="provider-priority" min="1" max="10" value="5">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Rate Limit (req/min)</label>
+                                    <input type="number" id="provider-rate-limit" min="1" value="60">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Cost per 1K tokens ($)</label>
+                                <input type="number" id="provider-cost" step="0.0001" min="0" value="0">
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary modal-close">Cancel</button>
+                                <button type="submit" class="btn-primary">Save Provider</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics View -->
+            <div id="analytics-view" class="view">
+                <div class="view-header">
+                    <div>
+                        <h2>Analytics & Reports</h2>
+                        <p class="view-subtitle">Phân tích chi tiết</p>
+                    </div>
+                    <select id="analytics-period" class="period-select">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                    </select>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Daily Usage Trend</h3>
+                        <canvas id="analytics-daily-chart"></canvas>
+                    </div>
+
+                    <div class="chart-card">
+                        <h3>Cost by Provider</h3>
+                        <canvas id="analytics-cost-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="analytics-tables">
+                    <div class="table-card">
+                        <h3>Top Users by Usage</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Requests</th>
+                                    <th>Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-users-table">
+                                <tr>
+                                    <td colspan="3" class="loading">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-card">
+                        <h3>Provider Performance</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Provider</th>
+                                    <th>Requests</th>
+                                    <th>Tokens</th>
+                                    <th>Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody id="provider-performance-table">
+                                <tr>
+                                    <td colspan="4" class="loading">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html>
