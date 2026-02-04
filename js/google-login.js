@@ -3,7 +3,7 @@
 
 const GoogleLogin = {
     GOOGLE_CLIENT_ID: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
-    API_BASE_URL: 'https://successlinkv2-backend.onrender.com/api',
+    API_BASE_URL: Config.API_BASE_URL,
 
     init() {
         // Wait for Google Identity Services to load

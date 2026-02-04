@@ -102,13 +102,17 @@ const Workspace = {
         try {
             // Call backend API to generate content
             const contentTypes = Array.from(this.selectedTypes);
-            const token = Storage.get('authToken');
+            const token = AuthService.getToken();
 
             if (!token) {
-                throw new Error('Vui lòng đăng nhập lại');
+                // Try to get token from storage one more time to be safe
+                const retryToken = Storage.get('authToken');
+                if (!retryToken) {
+                    throw new Error('Vui lòng đăng nhập lại (Token not found)');
+                }
             }
 
-            const response = await fetch('https://successlinkv2-backend.onrender.com/api/ai/generate', {
+            const response = await fetch(`${Config.API_BASE_URL}/ai/generate`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -214,5 +218,3 @@ if (document.readyState === 'loading') {
 } else {
     Workspace.init();
 }
-
-

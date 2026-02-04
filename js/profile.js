@@ -97,7 +97,7 @@ const ProfileMenu = {
             this.showLoading('Đang cập nhật...');
 
             // Call API to update name
-            const response = await fetch(`${GoogleLogin.API_BASE_URL}/auth/profile`, {
+            const response = await fetch(`${Config.API_BASE_URL}/auth/profile`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

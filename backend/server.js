@@ -125,15 +125,15 @@ const seedAIProvider = async () => {
 
     try {
         // Check if Gemini provider already exists
-        const providers = await AIProvider.findAll();
-        const geminiExists = providers.some(p => p.provider_type === 'gemini');
+        const providers = await AIProvider.getAll(true);
+        const geminiExists = providers.some(p => p.name === 'gemini');
 
         if (!geminiExists) {
             await AIProvider.create({
-                provider_type: 'gemini',
+                name: 'gemini',
                 display_name: 'Google Gemini Pro',
                 api_key: geminiKey,
-                endpoint_url: 'https://generativelanguage.googleapis.com/v1beta',
+                endpoint: 'https://generativelanguage.googleapis.com/v1beta',
                 model: 'gemini-1.5-pro',
                 priority: 1,
                 rate_limit: 60,

@@ -76,7 +76,7 @@ const LessonHistory = {
                 return;
             }
 
-            const response = await fetch(`${GoogleLogin.API_BASE_URL}/lessons`, {
+            const response = await fetch(`${Config.API_BASE_URL}/lessons`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -399,7 +399,7 @@ const LessonHistory = {
         }
 
         try {
-            const response = await fetch(`${GoogleLogin.API_BASE_URL}/lessons/${lesson.id}`, {
+            const response = await fetch(`${Config.API_BASE_URL}/lessons/${lesson.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -449,7 +449,7 @@ const LessonHistory = {
         }
 
         try {
-            const response = await fetch(`${GoogleLogin.API_BASE_URL}/lessons/${lesson.id}`, {
+            const response = await fetch(`${Config.API_BASE_URL}/lessons/${lesson.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${AuthService.getToken()}`

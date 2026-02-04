@@ -2,7 +2,7 @@
 // This replaces the mock service with real API calls
 
 const AIServiceBackend = {
-    API_BASE_URL: 'http://localhost:3000/api',
+    API_BASE_URL: Config.API_BASE_URL,
 
     // Generate content using backend API
     async generateContent(lessonTitle, contentTypes, userPreferences) {

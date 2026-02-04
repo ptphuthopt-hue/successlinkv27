@@ -1,6 +1,6 @@
 // Admin Dashboard JavaScript
 const AdminDashboard = {
-    API_BASE_URL: 'https://successlinkv2-backend.onrender.com/api',
+    API_BASE_URL: Config.API_BASE_URL,
     currentView: 'dashboard',
     charts: {},
 
