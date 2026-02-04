@@ -102,7 +102,7 @@ const Workspace = {
         try {
             // Call backend API to generate content
             const contentTypes = Array.from(this.selectedTypes);
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
 
             if (!token) {
                 throw new Error('Vui lòng đăng nhập lại');
@@ -214,3 +214,4 @@ if (document.readyState === 'loading') {
 } else {
     Workspace.init();
 }
+
