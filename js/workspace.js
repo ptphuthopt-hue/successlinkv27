@@ -156,7 +156,7 @@ const Workspace = {
             this.hideLoading();
 
             // Navigate to dashboard
-            this.navigateToDashboard();
+            this.navigateToDashboard(lessonData);
 
         } catch (error) {
             console.error('Error generating content:', error);
@@ -175,7 +175,7 @@ const Workspace = {
         DOM.addClass(loadingOverlay, 'hidden');
     },
 
-    navigateToDashboard() {
+    navigateToDashboard(lessonData = null) {
         const workspaceScreen = DOM.select('#workspace-screen');
         const dashboardScreen = DOM.select('#dashboard-screen');
 
@@ -184,7 +184,7 @@ const Workspace = {
 
         // Initialize dashboard with generated content
         if (window.Dashboard) {
-            Dashboard.loadContent();
+            Dashboard.loadContent(lessonData);
         }
     },
 
