@@ -162,22 +162,23 @@ const AdminDashboard = {
             document.getElementById('stat-total-lessons').textContent = data.lessons.total_lessons;
             document.getElementById('stat-new-lessons').textContent = `+${data.lessons.new_lessons_week} tuần này`;
 
-            document.getElementById('stat-ai-requests').textContent = data.ai.usage?.total_requests || 0;
+            // Updated with optional chaining for data.ai
+            document.getElementById('stat-ai-requests').textContent = data.ai?.usage?.total_requests || 0;
             document.getElementById('stat-avg-response').textContent =
-                `~${Math.round(data.ai.usage?.avg_response_time || 0)}ms`;
+                `~${Math.round(data.ai?.usage?.avg_response_time || 0)}ms`;
 
             document.getElementById('stat-total-cost').textContent =
-                `$${(data.ai.usage?.total_cost || 0).toFixed(2)}`;
+                `$${(data.ai?.usage?.total_cost || 0).toFixed(2)}`;
 
             // Create charts
-            this.createUsageTrendChart(data.ai.daily || []);
+            this.createUsageTrendChart(data.ai?.daily || []);
             this.createProviderDistributionChart();
 
             // Load recent users
             this.loadRecentUsers();
         } catch (error) {
             console.error('Error loading dashboard:', error);
-            alert('Failed to load dashboard data');
+            // alert('Failed to load dashboard data'); // Suppress alert to avoid annoyance
         }
     },
 
