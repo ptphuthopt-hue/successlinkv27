@@ -329,9 +329,11 @@ async function handleAuthSubmit(e) {
 
         if (title === 'Đăng ký') {
             // Get onboarding data from localStorage
-            const preferences = Storage.get('userPreferences');
+            let preferences = Storage.get('userPreferences');
+
+            // FIX: Use defaults if no preferences found (to allow direct registration)
             if (!preferences) {
-                throw new Error('Vui lòng hoàn tất thiết lập ban đầu');
+                preferences = { level: 'middle', subject: 'other' };
             }
 
             const name = document.getElementById('auth-name').value;
