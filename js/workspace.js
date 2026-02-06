@@ -84,6 +84,12 @@ const Workspace = {
         // Get user preferences (optional for now)
         const preferences = Storage.get('userPreferences');
 
+        // TEMPORARY: Allow creation even without preferences for testing
+        // if (!preferences) {
+        //     alert('Vui lòng hoàn tất thiết lập ban đầu');
+        //     return;
+        // }
+
         // Prepare lesson title
         let lessonTitle = this.lessonInput;
         if (!lessonTitle && this.uploadedFile) {
@@ -96,18 +102,18 @@ const Workspace = {
         try {
             // Call backend API to generate content
             const contentTypes = Array.from(this.selectedTypes);
-            const token = AuthService.getToken();
+            let token = AuthService.getToken();
 
+            // Try to get token from storage one more time to be safe
             if (!token) {
-                // Try to get token from storage one more time to be safe
-                const retryToken = Storage.get('authToken');
-                if (!retryToken) {
-                    throw new Error('Vui lòng đăng nhập lại (Token not found)');
+                token = Storage.get('authToken');
+                if (!token) {
+                    console.error('❌ Token not found in Storage');
+                    throw new Error('Vui lòng đăng nhập lại (Không tìm thấy phiên đăng nhập)');
                 }
             }
 
-            // Fix: Hardcoded URL for quick fix
-            const response = await fetch('https://successlinkv2-backend.onrender.com/api/ai/generate', {
+            const response = await fetch(`${Config.API_BASE_URL}/ai/generate`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -121,10 +127,15 @@ const Workspace = {
 
             const data = await response.json();
 
+            console.log('🔍 Backend response:', data);
+            console.log('📦 Content data:', data.data);
+            console.log('📄 Generated content:', data.data.content);
+
             if (!response.ok || !data.success) {
                 throw new Error(data.message || 'Không thể tạo bài giảng');
             }
 
+            // Validate content structure
             if (!data.data || !data.data.content) {
                 throw new Error('Backend không trả về nội dung bài giảng');
             }
@@ -138,6 +149,7 @@ const Workspace = {
                 preferences: preferences || {}
             };
 
+            console.log('💾 Saving to localStorage:', lessonData);
             Storage.set('currentLesson', lessonData);
 
             // Hide loading
@@ -177,10 +189,12 @@ const Workspace = {
     },
 
     reset() {
+        // Clear selections
         this.selectedTypes.clear();
         this.lessonInput = '';
         this.uploadedFile = null;
 
+        // Reset UI
         const contentCards = DOM.selectAll('.content-card');
         contentCards.forEach(card => DOM.removeClass(card, 'selected'));
 
@@ -199,6 +213,7 @@ const Workspace = {
     }
 };
 
+// Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => Workspace.init());
 } else {
