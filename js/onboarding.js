@@ -30,12 +30,28 @@ const Onboarding = {
     },
 
     checkOnboardingStatus() {
+        // Check if user is authenticated first
+        if (!AuthService.isAuthenticated()) {
+            return;
+        }
+
         const preferences = Storage.get('userPreferences');
 
         if (preferences && preferences.level && preferences.subject) {
             // User has completed onboarding, go to workspace
             this.navigateToWorkspace();
+        } else {
+            // User is logged in but hasn't completed onboarding
+            this.navigateToOnboarding();
         }
+    },
+
+    navigateToOnboarding() {
+        const loginScreen = DOM.select('#login-screen');
+        const onboardingScreen = DOM.select('#onboarding-screen');
+
+        if (loginScreen) DOM.removeClass(loginScreen, 'active');
+        if (onboardingScreen) DOM.addClass(onboardingScreen, 'active');
     },
 
     selectLevel(card) {
