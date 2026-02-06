@@ -26,47 +26,6 @@ const AdminDashboard = {
 
         const user = AuthService.getCurrentUser();
 
-        // TEMPORARY: Disable admin check for testing
-        // TODO: Re-enable after backend is deployed with proper admin user
-        /*
-        if (!user || user.role !== 'admin') {
-            // Show error but don't redirect - stay on admin page
-            const errorMsg = document.createElement('div');
-            errorMsg.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: white;
-                padding: 2rem;
-                border-radius: 1rem;
-                box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-                z-index: 10000;
-                text-align: center;
-                max-width: 400px;
-            `;
-            errorMsg.innerHTML = `
-                <h2 style="color: #dc3545; margin-bottom: 1rem;">⚠️ Access Denied</h2>
-                <p style="margin-bottom: 1.5rem;">Admin privileges required.</p>
-                <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">
-                    Current user: <strong>${user?.email || 'Not logged in'}</strong><br>
-                    Role: <strong>${user?.role || 'none'}</strong>
-                </p>
-                <p style="font-size: 0.85rem; color: #999;">
-                    Please contact system administrator to grant admin access.
-                </p>
-            `;
-            document.body.appendChild(errorMsg);
-
-            // Disable all interactive elements except the error message
-            document.querySelectorAll('button, a, input, select').forEach(el => {
-                el.style.pointerEvents = 'none';
-                el.style.opacity = '0.5';
-            });
-            return;
-        }
-        */
-
         // Display admin info
         document.getElementById('admin-name').textContent = user.name || 'Admin';
         document.getElementById('admin-email').textContent = user.email;
@@ -480,7 +439,7 @@ const AdminDashboard = {
         }
     },
 
-    // AI Provider Methods (continued in next part)
+    // AI Provider Methods
     async loadProviders() {
         try {
             const { data } = await this.apiCall('/admin/ai-providers');
@@ -578,9 +537,46 @@ const AdminDashboard = {
             document.getElementById('provider-priority').value = provider.priority;
             document.getElementById('provider-rate-limit').value = provider.rate_limit;
             document.getElementById('provider-cost').value = provider.cost_per_1k_tokens;
+
+            // Populate model options
+            this.updateModelOptions(provider.name);
         } catch (error) {
             console.error('Error loading provider data:', error);
         }
+    },
+
+    // AI Model Definitions
+    PROVIDER_MODELS: {
+        gemini: [
+            { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
+            { id: 'gemini-2.0-flash-lite-preview-02-05', name: 'Gemini 2.0 Flash Lite' },
+            { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
+            { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
+            { id: 'gemini-pro', name: 'Gemini 1.0 Pro' }
+        ],
+        openrouter: [
+            { id: 'google/gemini-2.0-flash-lite-preview-02-05:free', name: 'Google: Gemini 2.0 Flash Lite (Free)' },
+            { id: 'google/gemini-2.0-flash-001', name: 'Google: Gemini 2.0 Flash' },
+            { id: 'deepseek/deepseek-r1:free', name: 'DeepSeek: R1 (Free)' },
+            { id: 'deepseek/deepseek-r1-distill-llama-70b:free', name: 'DeepSeek: R1 Distill Llama 70B' },
+            { id: 'deepseek/deepseek-chat', name: 'DeepSeek: V3' },
+            { id: 'openai/gpt-3.5-turbo', name: 'OpenAI: GPT-3.5 Turbo' },
+            { id: 'openai/gpt-4o', name: 'OpenAI: GPT-4o' },
+            { id: 'anthropic/claude-3-haiku', name: 'Anthropic: Claude 3 Haiku' },
+            { id: 'meta-llama/llama-3-8b-instruct:free', name: 'Meta: Llama 3 8B (Free)' }
+        ],
+        chatgpt: [
+            { id: 'gpt-4o', name: 'GPT-4o' },
+            { id: 'gpt-4-turbo', name: 'GPT-4 Turbo' },
+            { id: 'gpt-4', name: 'GPT-4' },
+            { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' }
+        ],
+        claude: [
+            { id: 'claude-3-5-sonnet-20240620', name: 'Claude 3.5 Sonnet' },
+            { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus' },
+            { id: 'claude-3-sonnet-20240229', name: 'Claude 3 Sonnet' },
+            { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku' }
+        ]
     },
 
     updateProviderDefaults(providerType) {
@@ -588,25 +584,25 @@ const AdminDashboard = {
             gemini: {
                 display_name: 'Google Gemini',
                 endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
-                model: 'gemini-pro',
+                model: 'gemini-1.5-flash',
                 cost: 0
             },
             openrouter: {
                 display_name: 'OpenRouter',
                 endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-                model: 'gpt-3.5-turbo',
+                model: 'google/gemini-2.0-flash-lite-preview-02-05:free',
                 cost: 0.002
             },
             chatgpt: {
                 display_name: 'OpenAI ChatGPT',
                 endpoint: 'https://api.openai.com/v1/chat/completions',
-                model: 'gpt-4',
+                model: 'gpt-4o',
                 cost: 0.03
             },
             claude: {
                 display_name: 'Anthropic Claude',
                 endpoint: 'https://api.anthropic.com/v1/messages',
-                model: 'claude-3-sonnet',
+                model: 'claude-3-5-sonnet-20240620',
                 cost: 0.015
             }
         };
@@ -618,6 +614,26 @@ const AdminDashboard = {
             document.getElementById('provider-model').value = config.model;
             document.getElementById('provider-cost').value = config.cost;
         }
+
+        // Update datalist options
+        this.updateModelOptions(providerType);
+    },
+
+    updateModelOptions(providerType) {
+        const datalist = document.getElementById('provider-model-list');
+        if (!datalist) return;
+
+        datalist.innerHTML = '';
+
+        const models = this.PROVIDER_MODELS[providerType] || [];
+
+        models.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.id;
+            // .label shows the nice name "Google: Gemini 2.0..."
+            option.label = model.name;
+            datalist.appendChild(option);
+        });
     },
 
     async saveProvider() {
@@ -804,7 +820,6 @@ const AdminDashboard = {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                indexAxis: 'y',
                 plugins: {
                     legend: {
                         labels: { color: '#cbd5e1' }
@@ -812,7 +827,13 @@ const AdminDashboard = {
                 },
                 scales: {
                     y: {
-                        ticks: { color: '#cbd5e1' },
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#cbd5e1',
+                            callback: function (value) {
+                                return '$' + value;
+                            }
+                        },
                         grid: { color: '#334155' }
                     },
                     x: {
@@ -824,45 +845,49 @@ const AdminDashboard = {
         });
     },
 
-    updateTopUsersTable(topUsers) {
+    updateTopUsersTable(users) {
         const tbody = document.getElementById('top-users-table');
 
-        if (topUsers.length === 0) {
+        if (users.length === 0) {
             tbody.innerHTML = '<tr><td colspan="3" class="loading">No data</td></tr>';
             return;
         }
 
-        tbody.innerHTML = topUsers.map(user => `
+        tbody.innerHTML = users.map(user => `
             <tr>
-                <td>${user.name || user.email}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <img src="${user.profile_picture || '/default-avatar.png'}" 
+                             style="width: 24px; height: 24px; border-radius: 50%;">
+                        <span>${user.name || user.email}</span>
+                    </div>
+                </td>
                 <td>${user.requests}</td>
-                <td>$${user.cost.toFixed(2)}</td>
+                <td>$${user.cost.toFixed(4)}</td>
             </tr>
         `).join('');
     },
 
-    updateProviderPerformanceTable(providerData) {
+    updateProviderPerformanceTable(providers) {
         const tbody = document.getElementById('provider-performance-table');
 
-        if (providerData.length === 0) {
+        if (providers.length === 0) {
             tbody.innerHTML = '<tr><td colspan="4" class="loading">No data</td></tr>';
             return;
         }
 
-        tbody.innerHTML = providerData.map(provider => `
+        tbody.innerHTML = providers.map(p => `
             <tr>
-                <td>${provider.provider}</td>
-                <td>${provider.requests}</td>
-                <td>${(provider.tokens / 1000).toFixed(1)}K</td>
-                <td>$${provider.cost.toFixed(2)}</td>
+                <td>${p.provider}</td>
+                <td>${p.requests}</td>
+                <td>${p.tokens || '-'}</td>
+                <td>$${p.cost.toFixed(4)}</td>
             </tr>
         `).join('');
     }
 };
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => AdminDashboard.init());
-} else {
+// Initialize statistics
+document.addEventListener('DOMContentLoaded', () => {
     AdminDashboard.init();
-}
+});
