@@ -210,7 +210,9 @@
 
                             <div class="form-group">
                                 <label>Model</label>
-                                <input type="text" id="provider-model" placeholder="e.g., gemini-pro, gpt-4">
+                                <input type="text" id="provider-model" list="provider-model-list"
+                                    placeholder="Select or type model name" autocomplete="off">
+                                <datalist id="provider-model-list"></datalist>
                             </div>
 
                             <div class="form-row">
