@@ -46,15 +46,16 @@ const Dashboard = {
         }
     },
 
-    loadContent() {
-        // Load lesson data from storage
-        this.lessonData = Storage.get('currentLesson');
+    loadContent(data = null) {
+        // Load lesson data from memory or storage
+        this.lessonData = data || Storage.get('currentLesson');
 
         console.log('📚 Loading lesson data:', this.lessonData);
 
         if (!this.lessonData || !this.lessonData.content) {
             console.error('❌ No lesson data found or content is null');
-            console.log('Current localStorage:', localStorage.getItem('currentLesson'));
+            // Show empty state or alert
+            if (data) alert('Không thể tải nội dung bài giảng');
             return;
         }
 
@@ -107,6 +108,11 @@ const Dashboard = {
     },
 
     switchView(viewName) {
+        if (!this.lessonData || !this.lessonData.content) {
+            console.warn('⚠️ Cannot switch view: No lesson data');
+            return;
+        }
+
         // Update dock items
         const dockItems = DOM.selectAll('.dock-item[data-view]');
         dockItems.forEach(item => {
