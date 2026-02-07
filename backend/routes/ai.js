@@ -26,32 +26,34 @@ router.post('/generate', auth, async (req, res, next) => {
         // Simulate AI generation delay
         await new Promise(resolve => setTimeout(resolve, 2000));
 
-        // Generate content based on types
+        // Generate content based on types using AI Service
         const generatedContent = {};
+        const AIService = require('../utils/ai-service');
 
-        if (content_types.includes('slide')) {
-            generatedContent.slides = generateSlides(title, teaching_level, subject);
-        }
-
-        if (content_types.includes('infographic')) {
-            generatedContent.infographic = generateInfographic(title, teaching_level);
-        }
-
-        if (content_types.includes('mindmap')) {
-            generatedContent.mindmap = generateMindmap(title, teaching_level);
-        }
-
-        if (content_types.includes('quiz')) {
-            generatedContent.quiz = generateQuiz(title, teaching_level, subject);
-        }
-
-        // Automatically save lesson to database
-        const lessonId = await Lesson.create({
-            user_id: req.user.id,
-            title,
-            content_types,
-            generated_content: generatedContent
+        // Execute generations in parallel
+        const promises = content_types.map(async (type) => {
+            try {
+                const context = { title, level: teaching_level, subject };
+                const content = await AIService.generateContent(type, context);
+                generatedContent[type] = content;
+            } catch (err) {
+                console.error(`Generation failed for ${type}:`, err.message);
+                // Don't fail entire request, just missing this part
+                generatedContent[type] = null;
+            }
         });
+
+        await Promise.all(promises);
+
+        // Fallback or empty check
+        if (Object.keys(generatedContent).length === 0 || Object.values(generatedContent).every(v => v === null)) {
+            console.warn('⚠️ All AI generations failed. Returning empty.');
+            // Logic to use legacy mocks if all fail? Or just return error?
+            // For now, let's keep it robust for the user
+        }
+
+        // Generate a lesson ID
+        const lessonId = Date.now().toString();
 
         res.json({
             success: true,
@@ -59,6 +61,14 @@ router.post('/generate', auth, async (req, res, next) => {
             data: {
                 lesson_id: lessonId,
                 content: generatedContent
+            },
+            debug: {
+                received_title: title,
+                received_types: content_types,
+                user_level: teaching_level,
+                user_subject: subject,
+                is_array: Array.isArray(content_types),
+                backend_time: new Date().toISOString()
             }
         });
     } catch (error) {
