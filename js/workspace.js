@@ -128,11 +128,14 @@ const Workspace = {
             const data = await response.json();
 
             console.log('🔍 Backend response:', data);
-            console.log('📦 Content data:', data.data);
-            console.log('📄 Generated content:', data.data.content);
 
             if (!response.ok || !data.success) {
                 throw new Error(data.message || 'Không thể tạo bài giảng');
+            }
+
+            console.log('📦 Content data:', data.data);
+            if (data.data) {
+                console.log('📄 Generated content:', data.data.content);
             }
 
             // Validate content structure
